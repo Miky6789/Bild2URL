@@ -1,7 +1,0 @@
-name = "bild-upload"
-main = "worker.js"
-compatibility_date = "2026-06-02"
-
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "bilder"
