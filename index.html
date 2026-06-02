@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bild zu URL</title>
+  <style>
+    :root{
+      --bg:#07111f;--card:#0d1728;--card2:#101d33;--text:#eaf2ff;--muted:#91a4bf;--line:rgba(148,163,184,.22);
+      --accent:#38bdf8;--accent2:#7c3aed;--ok:#22c55e;--bad:#ef4444;--warn:#f59e0b;--shadow:0 24px 90px rgba(0,0,0,.45)
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:
+      radial-gradient(circle at 15% 0%,rgba(56,189,248,.28),transparent 34%),
+      radial-gradient(circle at 82% 18%,rgba(124,58,237,.25),transparent 30%),
+      linear-gradient(160deg,#020617,#0b1220 50%,#08111f);color:var(--text);padding:26px}
+    .wrap{width:min(1120px,100%);margin:auto}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin:4px 0 22px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;box-shadow:0 12px 35px rgba(56,189,248,.25);font-size:25px}.brand h1{font-size:clamp(28px,4vw,52px);line-height:1;margin:0}.brand p{margin:6px 0 0;color:var(--muted)}
+    .pill{border:1px solid var(--line);background:rgba(15,23,42,.65);border-radius:999px;padding:10px 14px;color:#c7d7ef;font-size:13px;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:linear-gradient(180deg,rgba(15,23,42,.90),rgba(9,15,28,.92));border:1px solid var(--line);border-radius:28px;padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+    .drop{position:relative;min-height:270px;border:2px dashed rgba(56,189,248,.55);border-radius:24px;background:linear-gradient(180deg,rgba(56,189,248,.09),rgba(2,6,23,.25));display:grid;place-items:center;text-align:center;padding:24px;cursor:pointer;transition:.18s;overflow:hidden}.drop:hover,.drop.drag{transform:translateY(-2px);border-color:#7dd3fc;background:rgba(56,189,248,.13)}.drop input{display:none}.dropIcon{font-size:54px;margin-bottom:10px}.drop strong{font-size:22px}.small{font-size:13px;color:var(--muted);line-height:1.45}.hint{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}.tag{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(2,6,23,.35);color:#cbd5e1}
+    .previewBox{display:none;margin-top:16px;border:1px solid var(--line);border-radius:22px;background:rgba(2,6,23,.45);overflow:hidden}.previewHead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}.fileName{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.previewBox img{width:100%;max-height:390px;object-fit:contain;display:block;background:#020617}.fileMeta{color:var(--muted);font-size:12px;white-space:nowrap}
+    .controls{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:16px}input,button{font:inherit;border-radius:16px;border:1px solid var(--line);padding:14px 15px}input{width:100%;background:#020817;color:var(--text);outline:none}input:focus{border-color:rgba(56,189,248,.85);box-shadow:0 0 0 4px rgba(56,189,248,.12)}button{background:linear-gradient(135deg,var(--accent),#60a5fa);color:#00111a;font-weight:900;cursor:pointer;border:0;transition:.15s}button:hover{filter:brightness(1.08);transform:translateY(-1px)}button:disabled{opacity:.55;cursor:not-allowed;transform:none}.ghost{background:rgba(15,23,42,.9);color:#dbeafe;border:1px solid var(--line)}.danger{background:rgba(239,68,68,.12);color:#fecaca;border:1px solid rgba(239,68,68,.35)}
+    .check{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--muted);font-size:13px}.check input{width:auto}.bar{height:10px;background:#020617;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:14px;display:none}.bar span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--ok));transition:.25s}
+    .result,.error{display:none;margin-top:16px;padding:16px;border-radius:20px}.result{background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.35)}.error{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.35);color:#fecaca;white-space:pre-wrap}.resultTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.resultTitle strong{font-size:18px}.urlRow{display:grid;grid-template-columns:1fr auto auto;gap:10px}.side h2{margin:0 0 12px}.steps{display:grid;gap:10px}.step{display:flex;gap:12px;padding:13px;border:1px solid var(--line);border-radius:18px;background:rgba(2,6,23,.25)}.num{width:28px;height:28px;display:grid;place-items:center;border-radius:10px;background:rgba(56,189,248,.16);color:#bae6fd;font-weight:900;flex:none}.step p{margin:2px 0 0;color:var(--muted);font-size:13px}.miniActions{display:grid;gap:10px;margin-top:14px}.galleryHead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px}.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;margin-top:12px}.tile{background:rgba(2,6,23,.55);border:1px solid var(--line);border-radius:18px;overflow:hidden}.tile img{width:100%;height:118px;object-fit:cover;display:block;background:#020617}.tileBody{padding:10px}.tile a{display:block;color:#bae6fd;text-decoration:none;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tileBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}.tileBtns button{font-size:12px;padding:8px;border-radius:10px}.empty{color:var(--muted);padding:16px;border:1px dashed var(--line);border-radius:16px;text-align:center;margin-top:12px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:#07111f;border:1px solid var(--line);border-radius:999px;padding:12px 16px;box-shadow:var(--shadow);transition:.18s;z-index:10}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    @media (max-width:850px){body{padding:14px}.grid{grid-template-columns:1fr}.top{align-items:flex-start}.pill{display:none}.controls,.urlRow{grid-template-columns:1fr}.card{padding:16px;border-radius:22px}.drop{min-height:230px}.brand h1{font-size:34px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><div class="logo">🔗</div><div><h1>Bild zu URL</h1><p>Bild hochladen, direkte URL kopieren, fertig.</p></div></div>
+      <div class="pill">Ohne R2 · GitHub Pages · Cloudflare Worker · GitHub Repo</div>
+    </header>
+
+    <div class="grid">
+      <main class="card">
+        <label class="drop" id="drop">
+          <div>
+            <div class="dropIcon">🖼️</div>
+            <strong>Bild hier reinziehen oder klicken</strong>
+            <div class="small">JPG, PNG, WebP oder GIF · maximal 8 MB</div>
+            <div class="hint"><span class="tag">Drag & Drop</span><span class="tag">Einfügen mit Ctrl+V</span><span class="tag">URL wird automatisch kopiert</span></div>
+          </div>
+          <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" />
+        </label>
+
+        <section id="previewBox" class="previewBox">
+          <div class="previewHead"><div class="fileName" id="fileName">Bild</div><div class="fileMeta" id="fileMeta"></div></div>
+          <img id="preview" alt="Vorschau" />
+        </section>
+
+        <div class="controls">
+          <input id="token" type="password" placeholder="Upload-Passwort" autocomplete="current-password" />
+          <button id="upload" disabled>Hochladen</button>
+        </div>
+        <label class="check"><input id="remember" type="checkbox"> Passwort auf diesem Gerät merken</label>
+        <div class="small">Dein GitHub Token bleibt sicher im Worker. Auf der Website wird nur dein Upload-Passwort eingegeben.</div>
+        <div class="bar" id="bar"><span id="barFill"></span></div>
+
+        <div id="result" class="result">
+          <div class="resultTitle"><strong>✅ Fertig hochgeladen</strong><span class="small" id="copiedNote">URL kopierbereit</span></div>
+          <div class="urlRow">
+            <input id="url" readonly />
+            <button id="copy">URL kopieren</button>
+            <button id="open" class="ghost">Öffnen</button>
+          </div>
+        </div>
+        <div id="error" class="error"></div>
+      </main>
+
+      <aside class="card side">
+        <h2>So benutzt du es</h2>
+        <div class="steps">
+          <div class="step"><div class="num">1</div><div><b>Bild wählen</b><p>Reinziehen, anklicken oder aus der Zwischenablage einfügen.</p></div></div>
+          <div class="step"><div class="num">2</div><div><b>Passwort eingeben</b><p>Das ist dein Cloudflare Secret <code>UPLOAD_TOKEN</code>.</p></div></div>
+          <div class="step"><div class="num">3</div><div><b>URL verwenden</b><p>Nach dem Upload wird die Bildadresse automatisch kopiert.</p></div></div>
+        </div>
+        <div class="miniActions">
+          <button class="ghost" id="testWorker">Worker testen</button>
+          <button class="danger" id="clearHistory">Verlauf löschen</button>
+        </div>
+        <p class="small">Der Verlauf wird nur lokal in deinem Browser gespeichert.</p>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:18px">
+      <div class="galleryHead"><h2 style="margin:0">Letzte Uploads</h2><span class="small" id="count"></span></div>
+      <div id="gallery" class="gallery"></div>
+      <div id="empty" class="empty">Noch keine Uploads in diesem Browser.</div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+  // HIER ÄNDERN: deine Worker-Adresse eintragen, z.B. https://bild-upload.deinname.workers.dev
+  const API_BASE = "https://bild2url.mikestaub705.workers.dev";
+
+  const $ = id => document.getElementById(id);
+  const fileInput = $('file'), drop = $('drop'), uploadBtn = $('upload'), preview = $('preview'), token = $('token');
+  const result = $('result'), errorBox = $('error'), urlInput = $('url'), gallery = $('gallery'), empty = $('empty');
+  const previewBox = $('previewBox'), fileName = $('fileName'), fileMeta = $('fileMeta'), remember = $('remember');
+  const bar = $('bar'), barFill = $('barFill'), toastBox = $('toast');
+  let selectedFile = null;
+
+  const savedToken = localStorage.getItem('uploadPassword');
+  if(savedToken){ token.value = savedToken; remember.checked = true; }
+
+  function toast(msg){ toastBox.textContent = msg; toastBox.classList.add('show'); setTimeout(()=>toastBox.classList.remove('show'),1600); }
+  function showError(msg){ errorBox.textContent = msg; errorBox.style.display='block'; result.style.display='none'; }
+  function clearError(){ errorBox.style.display='none'; errorBox.textContent=''; }
+  function formatBytes(bytes){ const units=['B','KB','MB']; let n=bytes,i=0; while(n>1024&&i<units.length-1){n/=1024;i++} return `${n.toFixed(n>=10?1:2)} ${units[i]}`; }
+  function isConfigured(){ return !API_BASE.includes('DEIN-WORKER-NAME') && API_BASE.startsWith('https://'); }
+
+  function setFile(file){
+    clearError(); result.style.display='none';
+    if(!isConfigured()) return showError('In index.html ist noch keine echte Worker-URL bei API_BASE eingetragen.');
+    if(!file) return;
+    if(!file.type.startsWith('image/')) return showError('Bitte wähle eine Bilddatei aus.');
+    const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+    if(!allowed.includes(file.type)) return showError('Nur JPG, PNG, WebP oder GIF sind erlaubt.');
+    if(file.size > 8 * 1024 * 1024) return showError('Das Bild ist zu gross. Maximal 8 MB.');
+    selectedFile = file; uploadBtn.disabled = false;
+    fileName.textContent = file.name || 'Bild'; fileMeta.textContent = formatBytes(file.size);
+    preview.src = URL.createObjectURL(file); previewBox.style.display = 'block';
+    toast('Bild bereit');
+  }
+
+  fileInput.addEventListener('change', e => setFile(e.target.files[0]));
+  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault(); drop.classList.add('drag')}));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault(); drop.classList.remove('drag')}));
+  drop.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+  document.addEventListener('paste', e => {
+    const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+    if(item) setFile(item.getAsFile());
+  });
+
+  uploadBtn.addEventListener('click', uploadImage);
+  token.addEventListener('keydown', e => { if(e.key === 'Enter' && selectedFile) uploadImage(); });
+  remember.addEventListener('change', () => { if(!remember.checked) localStorage.removeItem('uploadPassword'); });
+
+  async function uploadImage(){
+    if(!selectedFile) return;
+    if(!token.value.trim()) return showError('Bitte gib dein Upload-Passwort ein.');
+    if(remember.checked) localStorage.setItem('uploadPassword', token.value.trim());
+    uploadBtn.disabled = true; uploadBtn.textContent = 'Lädt hoch...'; clearError(); bar.style.display='block'; barFill.style.width='18%';
+    try{
+      const form = new FormData(); form.append('file', selectedFile);
+      barFill.style.width='45%';
+      const res = await fetch(API_BASE + '/upload', { method:'POST', headers:{ 'Authorization':'Bearer ' + token.value.trim() }, body: form });
+      barFill.style.width='78%';
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok || !data.url) throw new Error(data.error || JSON.stringify(data) || 'Upload fehlgeschlagen.');
+      barFill.style.width='100%';
+      urlInput.value = data.url; result.style.display = 'block'; $('copiedNote').textContent = 'URL kopierbereit';
+      addToHistory(data.url); renderGallery();
+      try{ await navigator.clipboard.writeText(data.url); $('copiedNote').textContent = 'URL automatisch kopiert'; toast('URL kopiert'); }catch{ toast('Upload fertig'); }
+    }catch(err){ showError(err.message); }
+    finally{ setTimeout(()=>{bar.style.display='none';barFill.style.width='0%'},500); uploadBtn.disabled = false; uploadBtn.textContent = 'Hochladen'; }
+  }
+
+  $('copy').addEventListener('click', async () => { await navigator.clipboard.writeText(urlInput.value); toast('URL kopiert'); });
+  $('open').addEventListener('click', () => { if(urlInput.value) window.open(urlInput.value, '_blank'); });
+  $('testWorker').addEventListener('click', async () => {
+    clearError();
+    if(!isConfigured()) return showError('API_BASE ist noch nicht auf deine echte Worker-URL gesetzt.');
+    try{ const res = await fetch(API_BASE); const data = await res.json().catch(()=>({})); toast(data.ok ? 'Worker läuft' : 'Worker antwortet'); }
+    catch(e){ showError('Worker nicht erreichbar: ' + e.message); }
+  });
+  $('clearHistory').addEventListener('click', () => { localStorage.removeItem('uploadedImages'); renderGallery(); toast('Verlauf gelöscht'); });
+
+  function addToHistory(url){
+    const saved = JSON.parse(localStorage.getItem('uploadedImages') || '[]').filter(u => u !== url);
+    saved.unshift(url); localStorage.setItem('uploadedImages', JSON.stringify(saved.slice(0,24)));
+  }
+  function renderGallery(){
+    const saved = JSON.parse(localStorage.getItem('uploadedImages') || '[]');
+    $('count').textContent = saved.length ? `${saved.length} gespeichert` : '';
+    empty.style.display = saved.length ? 'none' : 'block';
+    gallery.innerHTML = saved.map((u,i) => `<div class="tile"><img src="${escapeAttr(u)}" alt=""><div class="tileBody"><a href="${escapeAttr(u)}" target="_blank">${escapeHtml(u)}</a><div class="tileBtns"><button onclick="copyHistory(${i})">Kopieren</button><button class="ghost" onclick="openHistory(${i})">Öffnen</button></div></div></div>`).join('');
+  }
+  window.copyHistory = async i => { const saved = JSON.parse(localStorage.getItem('uploadedImages') || '[]'); await navigator.clipboard.writeText(saved[i]); toast('URL kopiert'); };
+  window.openHistory = i => { const saved = JSON.parse(localStorage.getItem('uploadedImages') || '[]'); window.open(saved[i], '_blank'); };
+  function escapeHtml(str){ return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function escapeAttr(str){ return escapeHtml(str); }
+  renderGallery();
+</script>
+</body>
+</html>
